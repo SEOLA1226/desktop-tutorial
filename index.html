@@ -50,10 +50,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 30px;
-            color: white;
             cursor: pointer;
             user-select: none;
+            -webkit-user-select: none;
+        }
+        .control-btn img {
+            width: 30px;
+            height: 30px;
         }
         .control-btn:active {
             background-color: #45a049;
@@ -67,8 +70,12 @@
     </div>
     <canvas id="gameCanvas" width="480" height="640" style="display: none;"></canvas>
     <div class="controls" style="display: none;">
-        <div class="control-btn" id="left-btn">←</div>
-        <div class="control-btn" id="right-btn">→</div>
+        <div class="control-btn" id="left-btn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/left.png" alt="Left">
+        </div>
+        <div class="control-btn" id="right-btn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/right.png" alt="Right">
+        </div>
     </div>
 
     <script>
@@ -78,6 +85,7 @@
         let gameRunning = false;
         let playerX = canvas.width / 2 - 20;
         const playerWidth = 40, playerHeight = 20;
+        const playerY = canvas.height - 100; // 캐릭터를 위로 올림
         let score = 0, timeLeft = 60;
         let items = [];
         const itemTypes = [
@@ -142,7 +150,7 @@
 
             // 플레이어
             ctx.fillStyle = "black";
-            ctx.fillRect(playerX, canvas.height - 40, playerWidth, playerHeight);
+            ctx.fillRect(playerX, playerY, playerWidth, playerHeight);
 
             // 아이템
             items.forEach((item, index) => {
@@ -152,7 +160,7 @@
 
                 // 아이템 먹었는지 체크
                 if (
-                    item.y + 20 >= canvas.height - 40 &&
+                    item.y + 20 >= playerY &&
                     item.x >= playerX &&
                     item.x <= playerX + playerWidth
                 ) {
