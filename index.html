@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>아이템 대소동</title>
     <style>
         body {
@@ -53,29 +53,28 @@
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
+            background-image: url("https://img.icons8.com/ios-filled/50/ffffff/left.png");
+            background-size: 30px;
+            background-position: center;
+            background-repeat: no-repeat;
         }
-        .control-btn img {
-            width: 30px;
-            height: 30px;
+        #right-btn {
+            background-image: url("https://img.icons8.com/ios-filled/50/ffffff/right.png");
         }
         .control-btn:active {
             background-color: #45a049;
         }
     </style>
 </head>
-<body>
+<body ontouchstart="">
     <div class="start-screen">
         <h1>아이템 대소동</h1>
         <button class="start-button" onclick="startGame()">게임 시작</button>
     </div>
     <canvas id="gameCanvas" width="480" height="640" style="display: none;"></canvas>
     <div class="controls" style="display: none;">
-        <div class="control-btn" id="left-btn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/left.png" alt="Left">
-        </div>
-        <div class="control-btn" id="right-btn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/right.png" alt="Right">
-        </div>
+        <div class="control-btn" id="left-btn"></div>
+        <div class="control-btn" id="right-btn"></div>
     </div>
 
     <script>
@@ -184,10 +183,22 @@
         }
 
         // 터치 버튼으로 플레이어 조작
-        document.getElementById("left-btn").addEventListener("touchstart", () => moveDirection = -1);
-        document.getElementById("left-btn").addEventListener("touchend", () => moveDirection = 0);
-        document.getElementById("right-btn").addEventListener("touchstart", () => moveDirection = 1);
-        document.getElementById("right-btn").addEventListener("touchend", () => moveDirection = 0);
+        document.getElementById("left-btn").addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            moveDirection = -1;
+        });
+        document.getElementById("left-btn").addEventListener("touchend", (e) => {
+            e.preventDefault();
+            moveDirection = 0;
+        });
+        document.getElementById("right-btn").addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            moveDirection = 1;
+        });
+        document.getElementById("right-btn").addEventListener("touchend", (e) => {
+            e.preventDefault();
+            moveDirection = 0;
+        });
     </script>
 </body>
 </html>
