@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이템 대소동</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+        }
+        .start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .start-button {
+            padding: 15px 30px;
+            font-size: 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .start-button:hover {
+            background-color: #45a049;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+        .control-btn:active {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="start-screen">
+        <h1>아이템 대소동</h1>
+        <button class="start-button" onclick="startGame()">게임 시작</button>
+    </div>
+    <canvas id="gameCanvas" width="480" height="640" style="display: none;"></canvas>
+    <div class="controls" style="display: none;">
+        <div class="control-btn" id="left-btn">←</div>
+        <div class="control-btn" id="right-btn">→</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let gameRunning = false;
+        let playerX = canvas.width / 2 - 20;
+        const playerWidth = 40, playerHeight = 20;
+        let score = 0, timeLeft = 60;
+        let items = [];
+        const itemTypes = [
+            { points: 10, color: "gold" },    // 10점
+            { points: 5, color: "silver" },  // 5점
+            { points: 3, color: "green" },   // 3점
+            { points: 2, color: "blue" },    // 2점
+            { points: 1, color: "brown" },   // 1점
+            { points: -5, color: "red" }     // 패널티
+        ];
+        let moveDirection = 0; // -1: 왼쪽, 1: 오른쪽, 0: 정지
+
+        function startGame() {
+            document.querySelector(".start-screen").style.display = "none";
+            document.querySelector(".controls").style.display = "flex";
+            canvas.style.display = "block";
+            gameRunning = true;
+            items = [];
+            score = 0;
+            timeLeft = 60;
+            playerX = canvas.width / 2 - 20;
+            spawnItems();
+            updateGame();
+            countdown();
+        }
+
+        function spawnItems() {
+            setInterval(() => {
+                if (gameRunning) {
+                    const type = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+                    const x = Math.random() * (canvas.width - 20);
+                    items.push({ x, y: 0, points: type.points, color: type.color });
+                }
+            }, 500); // 아이템 생성 주기
+        }
+
+        function countdown() {
+            const timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                } else {
+                    clearInterval(timer);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            gameRunning = false;
+            alert(`게임 종료! 점수: ${score}`);
+            location.reload(); // 새로고침으로 게임 리셋
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 플레이어 이동
+            playerX += moveDirection * 5;
+            playerX = Math.max(0, Math.min(canvas.width - playerWidth, playerX)); // 화면 경계 체크
+
+            // 플레이어
+            ctx.fillStyle = "black";
+            ctx.fillRect(playerX, canvas.height - 40, playerWidth, playerHeight);
+
+            // 아이템
+            items.forEach((item, index) => {
+                item.y += 3; // 아이템 떨어지는 속도
+                ctx.fillStyle = item.color;
+                ctx.fillRect(item.x, item.y, 20, 20);
+
+                // 아이템 먹었는지 체크
+                if (
+                    item.y + 20 >= canvas.height - 40 &&
+                    item.x >= playerX &&
+                    item.x <= playerX + playerWidth
+                ) {
+                    score += item.points;
+                    items.splice(index, 1); // 먹은 아이템 제거
+                }
+
+                // 화면 벗어난 아이템 제거
+                if (item.y > canvas.height) {
+                    items.splice(index, 1);
+                }
+            });
+
+            // 점수와 시간 표시
+            ctx.fillStyle = "black";
+            ctx.font = "20px Arial";
+            ctx.fillText(`점수: ${score}`, 10, 20);
+            ctx.fillText(`남은 시간: ${timeLeft}s`, 10, 50);
+
+            requestAnimationFrame(updateGame);
+        }
+
+        // 터치 버튼으로 플레이어 조작
+        document.getElementById("left-btn").addEventListener("touchstart", () => moveDirection = -1);
+        document.getElementById("left-btn").addEventListener("touchend", () => moveDirection = 0);
+        document.getElementById("right-btn").addEventListener("touchstart", () => moveDirection = 1);
+        document.getElementById("right-btn").addEventListener("touchend", () => moveDirection = 0);
+    </script>
+</body>
+</html>
